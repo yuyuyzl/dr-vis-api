@@ -98,19 +98,19 @@ analysis.init({
     },
 
     emdAdacare:{
-        type:Sequelize.BLOB,
+        type:Sequelize.JSON,
         allowNull:true
     },
     emdStagenet:{
-        type:Sequelize.BLOB,
+        type:Sequelize.JSON,
         allowNull:true
     },
     featureAtt:{
-        type:Sequelize.BLOB,
+        type:Sequelize.JSON,
         allowNull:true
     },
     temporalAtt:{
-        type:Sequelize.BLOB,
+        type:Sequelize.JSON,
         allowNull:true
     },
     predAdacare:{
