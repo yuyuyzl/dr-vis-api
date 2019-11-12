@@ -23,12 +23,14 @@ router.get("/p/:id",async ctx=>{
 
 router.get("/lab/:id",async ctx=>{
     const id=ctx.params.id;
-    const data=await db.labtest.findAll({where:{pdid:+id},order:["date"]});
+    const query=ctx.query;
+    const data=await db.labtest.findAll({where:{pdid:+id,...query},order:["date"]});
     ctx.body=data;
 });
 router.get("/analyze/:id",async ctx=>{
     const id=ctx.params.id;
-    const data=(await db.analysis.findAll({where:{pdid:+id},order:["date"]}))
+    const query=ctx.query;
+    const data=(await db.analysis.findAll({where:{pdid:+id,...query},order:["date"]}));
     ctx.body=data;
 });
 
