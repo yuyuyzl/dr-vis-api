@@ -5,6 +5,11 @@ const db=require("./db");
 
 const app=new Koa();
 
+app.use(async (ctx,next)=>{
+    ctx.set("Access-Control-Allow-Origin","*");
+    await next();
+});
+
 router.get("/",async ctx=>{
     ctx.body="Dr.Vis API";
 });
@@ -27,6 +32,7 @@ router.get("/lab/:id",async ctx=>{
     const data=await db.labtest.findAll({where:{pdid:+id,...query},order:["date"]});
     ctx.body=data;
 });
+
 router.get("/analyze/:id",async ctx=>{
     const id=ctx.params.id;
     const query=ctx.query;
