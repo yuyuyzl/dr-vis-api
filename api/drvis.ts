@@ -1,18 +1,40 @@
 const db=require("../db");
 
 export default {
-    p:{
+    patient:{
         requestOptions:{
-            api:'p',
+            api:'patient',
             v:'1.0',
             data:{}
         },
         middleware: async(params)=>{
-            const id=params.id;
-            return db.patient.findOne({where: {pdid: +id}});
+            if(params.all) {
+                delete params.all;
+                return db.patient.findAll({where: params});
+            }
+            return db.patient.findOne({where: params});
         }
     },
-
+    lab:{
+        requestOptions:{
+            api:'lab',
+            v:'1.0',
+            data:{}
+        },
+        middleware: async(params)=>{
+            return db.labtest.findOne({where: params});
+        }
+    },
+    analyze:{
+        requestOptions:{
+            api:'analyze',
+            v:'1.0',
+            data:{}
+        },
+        middleware: async(params)=>{
+            return db.analyze.findOne({where: params});
+        }
+    }
 }
 
 /*

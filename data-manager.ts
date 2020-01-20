@@ -1,10 +1,15 @@
 import Apis from './api/index'
 
+interface IApi {
+    requestOptions:any,
+    middleware?:Function,
+}
+
 class DataManager {
-    private readonly dict: any;
-    constructor(apis){
+    private readonly dict: Record<string,IApi>;
+    constructor(apis:Record<string,IApi>){
         this.dict={...apis};
-        for (let api of apis){
+        for (let [key,api] of Object.entries(apis)){
             this.dict[api.requestOptions.api+api.requestOptions.v]=api;
             if(!this.dict[api.requestOptions.api]||(this.dict[api.requestOptions.api].requestOptions.v<api.requestOptions.v))
                 this.dict[api.requestOptions.api]=api;

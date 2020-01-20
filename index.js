@@ -10,7 +10,7 @@ const app=new Koa();
 app.use(bodyParser());
 app.use(async (ctx,next)=>{
     await next();
-    ctx.set("Access-Control-Allow-Origin",ctx.origin);
+    ctx.set("Access-Control-Allow-Origin",ctx.header.origin||"*");
     ctx.set("Access-Control-Allow-Credentials","true");
 });
 
