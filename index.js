@@ -1,43 +1,42 @@
 const Koa=require("koa");
 const router=require("koa-router")();
 const config=require("./config");
-const db=require("./db");
+//const db=require("./db");
+const bodyParser = require('koa-bodyparser')
+const DataManager=require('./data-manager');
 
 const app=new Koa();
 
+app.use(bodyParser());
 app.use(async (ctx,next)=>{
-    ctx.set("Access-Control-Allow-Origin","*");
+    await next();
+    ctx.set("Access-Control-Allow-Origin",ctx.origin);
+    ctx.set("Access-Control-Allow-Credentials","true");
+});
+
+router.get("/:apiPath/:apiVersion?",async (ctx,next)=> {
+    if (ctx.query.data) ctx.apiParams = JSON.parse(ctx.query.data);
     await next();
 });
 
-router.get("/",async ctx=>{
-    ctx.body="Dr.Vis API";
+router.all("/:apiPath/:apiVersion?",async (ctx,next)=>{
+    ctx.responseData={};
+    ctx.responseRaw={
+        api:ctx.params.apiPath,
+        v:ctx.params.apiVersion,
+    };
+    try{
+        await next();
+        ctx.responseRaw.ret=["SUCCESS::调用成功"];
+    }catch (e) {
+        ctx.responseRaw.ret=["FAILED::"+e];
+    }finally {
+        ctx.body=JSON.stringify(ctx.responseRaw);
+    }
 });
 
-router.get("/p",async ctx=>{
-    const query=ctx.query;
-    const data=await db.patient.findAll({where:query});
-    ctx.body=data;
-});
-
-router.get("/p/:id",async ctx=>{
-    const id=ctx.params.id;
-    const data=await db.patient.findOne({where:{pdid:+id}});
-    ctx.body=data;
-});
-
-router.get("/lab/:id",async ctx=>{
-    const id=ctx.params.id;
-    const query=ctx.query;
-    const data=await db.labtest.findAll({where:{pdid:+id,...query},order:["date"]});
-    ctx.body=data;
-});
-
-router.get("/analyze/:id",async ctx=>{
-    const id=ctx.params.id;
-    const query=ctx.query;
-    const data=(await db.analysis.findAll({where:{pdid:+id,...query},order:["date"]}));
-    ctx.body=data;
+router.all("/:apiPath/:apiVersion?", async (ctx,next)=>{
+    ctx.responseRaw={...ctx.responseRaw,...await DataManager.callApi(ctx.params.apiPath, ctx.params.apiVersion, ctx.apiParams)}
 });
 
 app.use(router.routes());
