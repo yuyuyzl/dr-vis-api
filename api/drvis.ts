@@ -22,7 +22,7 @@ export default {
             data:{}
         },
         middleware: async(params)=>{
-            return db.labtest.findOne({where: params});
+            return db.labtest.findAll({where: params, order: ["date"]});
         }
     },
     analyze:{
@@ -32,7 +32,7 @@ export default {
             data:{}
         },
         middleware: async(params)=>{
-            return db.analyze.findOne({where: params});
+            return db.analyze.findAll({where:params,order:["date"]});
         }
     }
 }
