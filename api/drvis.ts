@@ -1,38 +1,63 @@
-const db=require("../db");
+import {Op} from "sequelize";
+
+const db = require("../db");
 
 export default {
-    patient:{
-        requestOptions:{
-            api:'patient',
-            v:'1.0',
-            data:{}
+    patient: {
+        requestOptions: {
+            api: 'patient',
+            v: '1.0',
+            data: {}
         },
-        middleware: async(params)=>{
-            if(params.all) {
+        middleware: async (params) => {
+            if (params.all) {
                 delete params.all;
                 return db.patient.findAll({where: params});
             }
             return db.patient.findOne({where: params});
         }
     },
-    lab:{
-        requestOptions:{
-            api:'lab',
-            v:'1.0',
-            data:{}
+    lab: {
+        requestOptions: {
+            api: 'lab',
+            v: '1.0',
+            data: {}
         },
-        middleware: async(params)=>{
+        middleware: async (params) => {
             return db.labtest.findAll({where: params, order: ["date"]});
         }
     },
-    analyze:{
-        requestOptions:{
-            api:'analyze',
-            v:'1.0',
-            data:{}
+    analyze: {
+        requestOptions: {
+            api: 'analyze',
+            v: '1.0',
+            data: {}
         },
-        middleware: async(params)=>{
-            return db.analyze.findAll({where:params,order:["date"]});
+        middleware: async (params) => {
+            return db.analyze.findAll({where: params, order: ["date"]});
+        }
+    },
+    search: {
+        requestOptions: {
+            api: 'search',
+            v: '1.0',
+            data: {},
+        },
+        middleware: async (params) => {
+            return db.patient.findAll({
+                where: {
+                    [Op.and]: params.key.split(" ").map(
+                        (keyword) => ({
+                            [Op.or]: [{
+                                name: {
+                                    [Op.substring]: keyword
+                                }
+                            }, {
+                                ...+keyword ? {pdid: +keyword,} : {}
+                            }]
+                        }))
+                }
+            });
         }
     }
 }
