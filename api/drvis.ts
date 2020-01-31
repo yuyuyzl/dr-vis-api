@@ -1,4 +1,5 @@
 import {Op} from "sequelize";
+import axios from "axios";
 
 const db = require("../db");
 
@@ -34,7 +35,7 @@ export default {
             data: {}
         },
         middleware: async (params) => {
-            return db.analyze.findAll({where: params, order: ["date"]});
+            return (await axios.post("http://api.drvis.yuyuyz.ltd:10406/",params)).data;
         }
     },
     search: {

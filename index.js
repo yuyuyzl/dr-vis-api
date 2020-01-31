@@ -12,12 +12,19 @@ app.use(async (ctx,next)=>{
     await next();
     ctx.set("Access-Control-Allow-Origin",ctx.header.origin||"*");
     ctx.set("Access-Control-Allow-Credentials","true");
+    ctx.set("Access-Control-Allow-Headers","*");
 });
 
 router.get("/:apiPath/:apiVersion?",async (ctx,next)=> {
     if (ctx.query.data) ctx.apiParams = JSON.parse(ctx.query.data);
     await next();
 });
+
+router.post("/:apiPath/:apiVersion?",async (ctx,next)=> {
+    if (ctx.request.body) ctx.apiParams = ctx.request.body;
+    await next();
+});
+
 
 router.all("/:apiPath/:apiVersion?",async (ctx,next)=>{
     ctx.responseData={};
