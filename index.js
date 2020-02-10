@@ -27,23 +27,32 @@ router.post("/:apiPath/:apiVersion?",async (ctx,next)=> {
 
 
 router.all("/:apiPath/:apiVersion?",async (ctx,next)=>{
+    if(!config.api.secret||ctx.query.secret===config.api.secret)ctx.sudo=true;
     ctx.responseData={};
     ctx.responseRaw={
         api:ctx.params.apiPath,
         v:ctx.params.apiVersion,
     };
-    try{
+    try {
+        if (!ctx.sudo) {
+            if (ctx.params.apiPath !== "analyze" && (!ctx.apiParams.pdid || !(config.api.whitelist.indexOf(+ctx.apiParams.pdid) >= 0))) throw "权限不足";
+        }
         await next();
-        ctx.responseRaw.ret=["SUCCESS::调用成功"];
+        ctx.responseRaw.ret = ["SUCCESS::调用成功"];
     }catch (e) {
         ctx.responseRaw.ret=["FAILED::"+e];
+        ctx.responseRaw.data=null;
     }finally {
         ctx.body=JSON.stringify(ctx.responseRaw);
     }
 });
 
 router.all("/:apiPath/:apiVersion?", async (ctx,next)=>{
-    ctx.responseRaw={...ctx.responseRaw,...await DataManager.callApi(ctx.params.apiPath, ctx.params.apiVersion, ctx.apiParams)}
+    ctx.responseRaw={...ctx.responseRaw,...await DataManager.callApi(ctx.params.apiPath, ctx.params.apiVersion, ctx.apiParams)};
+    if(!ctx.sudo){
+        if(ctx.responseRaw.data&&ctx.responseRaw.data.dataValues)delete ctx.responseRaw.data.dataValues.name;
+        if(ctx.responseRaw.data&&ctx.responseRaw.data.dataValues)delete ctx.responseRaw.data.dataValues.birthDate;
+    }
 });
 
 app.use(router.routes());
