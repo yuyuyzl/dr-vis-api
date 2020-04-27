@@ -2,17 +2,21 @@ const Koa=require("koa");
 const router=require("koa-router")();
 const config=require("./config");
 //const db=require("./db");
-const bodyParser = require('koa-bodyparser')
+const bodyParser = require('koa-bodyparser');
 const DataManager=require('./data-manager');
 
 const app=new Koa();
 
 app.use(bodyParser());
 app.use(async (ctx,next)=>{
-    await next();
     ctx.set("Access-Control-Allow-Origin",ctx.header.origin||"*");
     ctx.set("Access-Control-Allow-Credentials","true");
     ctx.set("Access-Control-Allow-Headers","*");
+    if (ctx.method === 'OPTIONS') {
+        ctx.body = 200;
+    } else {
+        await next();
+    }
 });
 
 router.get("/:apiPath/:apiVersion?",async (ctx,next)=> {

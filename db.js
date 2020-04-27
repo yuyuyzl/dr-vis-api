@@ -47,6 +47,10 @@ patient.init({
         type: Sequelize.INTEGER,
         allowNull: true
     },
+    deathReasonText:{
+        type:Sequelize.STRING(45),
+        allowNull:true
+    },
     height: {
         type: Sequelize.DECIMAL(20,10),
         allowNull: true
@@ -55,6 +59,48 @@ patient.init({
         type: Sequelize.DECIMAL(20,10),
         allowNull: true
     },
+    originDisease:{
+        type:Sequelize.STRING(45),
+        allowNull:true
+    },
+    diabetes:{
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
+    outcome:{
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
+    duplicate:{
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
+    ...Object.fromEntries([
+        'scr',
+        'heart_failure',
+        'lung_infect',
+        'chd',
+        'mi',
+        'ci',
+        'ch',
+        'amputation',
+        'urea',
+        'albumin',
+        'hgb',
+        'ca',
+        'p',
+        'pth',
+        'bmi',
+        'epi',
+        'sbp',
+        'dbp',
+        'death_number'
+    ].map(name => [name, (
+        {
+            type: Sequelize.DOUBLE,
+            allowNull: true
+        }
+    )]))
 
 
 }, {
